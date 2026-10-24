@@ -172,6 +172,28 @@ A minimal map is therefore just a grid and a wave table. Everything else
 resolves to base defaults. A map that wants more adds a `[params]` table, a
 module list, or extra ids from its own pack's `data/`.
 
+### Base pack assets and distribution
+
+Base art is CC0 where possible (Kenney's Tower Defense Top-Down tileset,
+Particle Pack and audio packs), CC-BY as a fallback with a `CREDITS.md` in
+the pack, never share-alike or non-commercial. Modders may copy and recolor
+base assets into their own packs without tracking attribution.
+
+The base pack is not committed as PNGs. A script in `packs/base/` downloads
+the upstream archives at pinned URLs and checksums, picks the files used,
+writes the tile kind and sprite tables, and produces `base-<version>.zip`.
+CI builds it and attaches it to every release next to the binaries and the
+web build. That zip is what clients fetch:
+
+- **Browser**: deployed to Pages beside the wasm; fetched on load, cached by
+  the browser and stored in IndexedDB for return visits.
+- **Native**: downloaded on first start from the release that matches the
+  binary's version, verified by checksum, kept in the OS cache directory.
+  `--pack-dir` points at a local pack for offline or development use.
+
+The binaries embed only a tiny placeholder set (colored shapes, one font) so
+they start and can show an error or play headless when the download fails.
+
 ## Packs
 
 ```
