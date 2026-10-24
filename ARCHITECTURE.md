@@ -17,6 +17,7 @@ as wasm too (written in Rust, compiled to `wasm32-unknown-unknown`).
 | Concern | Choice | Reason |
 |---|---|---|
 | Engine | Bevy 0.20 (pinned) for the client; plain Rust for the sim | Runs on all 4 targets |
+| Rendering | Top-down 2D sprites on a square grid; ranges and paths as overlays | Modders ship a PNG, not a rigged model; stays fast in the browser; TD is read as a grid. Isometric looks are an art choice, not an engine mode. 3D would be a separate client against the same sim |
 | Simulation | `td_core`, fixed tick (30 Hz), deterministic, players and teams from day one | Headless tests, replays, lockstep multiplayer later |
 | Rules | wasm modules run by **wasmi** on every target, fuel-metered | Pure Rust host, runs in the browser too, sandboxed, runaway code stops deterministically |
 | Stat tables | TOML inside the pack | Units and structures are data; no code needed to add a tower |
