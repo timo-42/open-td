@@ -188,7 +188,7 @@ A map says which modules it runs and may give them parameters:
 ```toml
 [map]
 name = "Crossroads"
-modules = ["waves", "team_lives", "builders"]
+modules = ["waves", "lives", "income", "builders"]   # default if omitted
 players = 4                      # lanes are assigned in order
 
 [params]                         # read by the modules, opaque to the engine
