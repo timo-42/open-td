@@ -57,13 +57,15 @@ mods (no instruction limit; possible later as a second backend).
   | `unit` | player-controlled units (builders, heroes) may walk here |
   | `build` | structures may be placed here |
 
-  Every unit kind has a `moves_on` mask and every structure a `targets` mask.
-  Pathfinding is one algorithm: a flow field per mask in use, computed from
-  the exit over tiles matching the mask. A flyer is a unit whose mask is
-  `air`; it is not a special case anywhere else. Placing a structure clears
-  `ground` on its tile (not `air`), the affected flow fields are recomputed,
-  and a placement that would leave a spawn with no route is refused. That is
-  all a mazing map needs.
+  Every unit kind has a `moves_on` mask. Every structure kind has a `targets`
+  mask (what it can shoot) and a `blocks` mask (which flags it removes from
+  its tile while it stands; default `ground`, a tall wall might be
+  `ground + air`). Pathfinding is one algorithm: a flow field per mask in
+  use, computed from the exit over tiles matching the mask. A flyer is a
+  unit whose mask is `air`; it is not a special case anywhere else. Placing
+  or selling a structure recomputes the affected flow fields, and a placement
+  that would leave a spawn with no route for any unit mask in play is
+  refused. That is all a mazing map needs.
 - **Players and teams**: every command carries the issuing player. The engine
   only checks ownership; rules decide the rest.
 - **Resources**: named integer counters per player and per team. Names are
@@ -203,6 +205,8 @@ cost = { gold = 40, mana = 10 }
 range = 3.5
 damage = 12
 cooldown = 0.8
+targets = ["ground", "air"]
+blocks = ["ground"]              # a sky wall would list ["ground", "air"]
 ```
 
 Base data (`data/*.toml`) is shared: a pack can add units and structures but
