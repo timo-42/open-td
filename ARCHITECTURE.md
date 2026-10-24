@@ -31,8 +31,8 @@ mods (no instruction limit; possible later as a second backend).
 ```
 ┌───────────────────────────────────────────────────────────────┐
 │ Pack (zip): info.toml, maps/, data/, modules/*.wasm, assets/  │
-│   rule modules: classic.wasm, team_lives.wasm, versus.wasm,  │
-│                 builders.wasm, gold_and_wood.wasm, …          │
+│   rule modules: waves.wasm, lives.wasm, versus.wasm,          │
+│                 builders.wasm, income.wasm, …                 │
 │   map generators: canyon_gen.wasm                             │
 ├───────────────────────────────────────────────────────────────┤
 │ td_mods  (wasmi host, fuel, Event → Command bridge)           │
@@ -49,9 +49,11 @@ mods (no instruction limit; possible later as a second backend).
   tiles. A lane has an owner (a player, a team, or shared).
 - **Players and teams**: every command carries the issuing player. The engine
   only checks ownership; rules decide the rest.
-- **Resources**: named integer counters per player and per team
-  (`gold`, `wood`, `lives`, anything). The engine stores and reports them,
-  nothing more.
+- **Resources**: named integer counters per player and per team. Names are
+  opaque strings chosen by the map or module: `gold`, `wood`, `mana`, `lives`,
+  `souls`, whatever the map wants. The engine stores them, reports changes and
+  lets structures and units declare costs in any of them. It never
+  special-cases a name.
 - **Units**: anything that moves. Creeps, builders, sent monsters. A unit has
   an owner, stats from a data table, a lane and a position. The engine moves
   it along the lane path or to a requested cell.
@@ -96,7 +98,7 @@ Commands a module (or the player's input layer) can issue:
 | `OrderMove { unit, to }` | walk a unit to a cell |
 | `Build { kind, at, owner, builder? }` | place a structure, optionally requiring a builder to walk there first |
 | `Sell { structure }` | |
-| `SetResource { scope, name, delta }` | |
+| `AddResource { scope, name, delta }` | any name; scope is a player or a team; fails if it would go negative unless `allow_negative` |
 | `SetTimer { id, ticks, repeat }`, `CancelTimer { id }` | |
 | `SetAllowed { player, structures: [...] }` | restrict the build palette |
 | `Message { to, text }` | HUD text |
@@ -113,14 +115,16 @@ The base pack ships these as wasm, and a map picks which to load:
 | Module | What it does |
 |---|---|
 | `waves` | reads the map's wave table, spawns on timers, emits wave numbers as messages |
-| `solo_lives` | each player has `lives`; leak costs lives; last player standing or survive all waves |
-| `team_lives` | all lanes feed one shared team `lives` pool |
-| `versus` | players earn `gold` income; `send_monster` request spawns a bought creep into the opposing team's lane; team with lives left wins |
-| `builders` | gives each player one builder unit; `buy_builder` request adds another; `Build` must name a builder |
-| `wood` | second resource with its own income rule |
+| `lives` | a leak subtracts from a resource (name and scope from params: per player, or shared per team); whoever still has some left when the waves end, or last standing, wins |
+| `income` | periodic income and kill bounty for any set of resources, amounts from params |
+| `versus` | `send_monster` request spends a resource and spawns the bought creep into the opposing team's lane |
+| `builders` | gives each player one builder unit; `buy_builder` request spends a resource and adds another; `Build` must name a builder |
 
-A pack author combines them (`modules = ["waves", "team_lives", "builders"]`)
-or replaces any with their own. There is no privileged "mode" concept in the
+Resource names are never hard-coded in the engine or in these modules; each
+takes them from `[params]`. Solo lanes versus shared team lives is the same
+`lives` module with a different scope. A pack author combines modules
+(`modules = ["waves", "lives", "income", "builders"]`) or replaces any with
+their own. There is no privileged "mode" concept in the
 engine; modules run in the listed order and the first `EndGame` wins.
 
 ## Packs
@@ -143,10 +147,13 @@ modules = ["waves", "team_lives", "builders"]
 players = 4                      # lanes are assigned in order
 
 [params]                         # read by the modules, opaque to the engine
-lives = 30
-start.gold = 100
-start.wood = 0
+lives.resource = "lives"         # any name; "hp", "castle_health", …
+lives.scope = "team"             # or "player"
+lives.start = 30
+income.start = { gold = 100, mana = 0 }
+income.per_wave = { gold = 20, mana = 5 }
 builders.max = 2
+builders.cost = { gold = 50 }
 
 [[lane]]
 owner = "player"                 # one lane per player
@@ -160,6 +167,19 @@ S..######
 unit = "grunt"
 count = 10
 interval = 0.5
+```
+
+Stat tables declare costs as a table of resource name to amount, so a tower
+can cost `{ gold = 40, mana = 10 }` on one map's data and the engine checks
+and deducts whatever is listed:
+
+```toml
+[[structure]]
+id = "arcane_tower"
+cost = { gold = 40, mana = 10 }
+range = 3.5
+damage = 12
+cooldown = 0.8
 ```
 
 Base data (`data/*.toml`) is shared: a pack can add units and structures but
@@ -208,7 +228,7 @@ crates/
   td_headless/  run a pack without a window (tests, balance, bots)
   td_client/    Bevy app: rendering, input, HUD, generator forms
 modules/        base rule modules, each a cdylib for wasm32-unknown-unknown
-  waves/ solo_lives/ team_lives/ versus/ builders/ wood/ canyon_gen/
+  waves/ lives/ income/ versus/ builders/ canyon_gen/
 packs/
   base/         base data, starter maps, built modules
 ```
@@ -224,9 +244,9 @@ packs/
 1. `td_mod_api`, `td_core`, `td_headless`: lanes, units, structures, resources,
    timers, events, commands, a Rust-side test rule to prove the loop
 2. `td_mods` (wasmi host) + `td_mod_sdk`; port the test rule to `modules/waves`
-   and `modules/solo_lives`; now the game is playable headless from wasm
+   and `modules/lives`; now the game is playable headless from wasm
 3. `td_content`: TOML + zip packs, the base pack
 4. Minimal `td_client` (shapes, click to build)
-5. `builders`, `team_lives`, `versus`, `wood`, `canyon_gen`
+5. `income`, `builders`, `versus`, `canyon_gen`
 6. CI: native matrix + web build to Pages
 7. Then: sprites/audio, pack registry, lockstep multiplayer
