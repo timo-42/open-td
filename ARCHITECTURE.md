@@ -50,7 +50,8 @@ mods (no instruction limit; possible later as a second backend).
 
 - **Lanes**: a map has one or more lanes, each a tile grid with spawn and exit
   tiles. A lane has an owner (a player, a team, or shared).
-- **Tiles** carry a set of flags, nothing else:
+- **Tiles** have a kind. A tile kind (`grass`, `cliff`, `water`, defined in
+  data) is a set of flags plus a sprite; the engine only sees the flags:
 
   | Flag | Meaning |
   |---|---|
@@ -148,6 +149,29 @@ takes them from `[params]`. Solo lanes versus shared team lives is the same
 their own. There is no privileged "mode" concept in the
 engine; modules run in the listed order and the first `EndGame` wins.
 
+## The base pack
+
+Maps should not repeat what every map needs. The base pack ships a complete
+default set, and a map references it by id. A pack may add new ids; it may
+not redefine base ids. Loading order is base first, then the pack, and a
+duplicate id is a load error, so a base update can never silently change a
+map.
+
+| Base content | Examples |
+|---|---|
+| Tile kinds | `grass`, `path`, `field`, `dirt`, `cliff`, `water`, `void`, each with flags and sprites |
+| Structures | a tower line (arrow, cannon, frost, arcane, …), `house`, `palisade` and `stone_wall` with `hp` so strong creeps can break through |
+| Units | a creep roster across sizes, armor types and `moves_on` masks, plus a few bosses |
+| Builders | a small set of builder units with different speeds and build palettes |
+| Projectiles and VFX | arrow, bolt, shell, fire, lightning, wind, debris presets |
+| Damage table | `normal`, `pierce`, `siege`, `magic` against `light`, `heavy`, `fortified` |
+| Modules | `waves`, `lives`, `income`, `versus`, `builders`, `canyon_gen` |
+| Defaults | module list, params and legend a map gets when it omits them |
+
+A minimal map is therefore just a grid and a wave table. Everything else
+resolves to base defaults. A map that wants more adds a `[params]` table, a
+module list, or extra ids from its own pack's `data/`.
+
 ## Packs
 
 ```
@@ -176,11 +200,13 @@ income.per_wave = { gold = 20, mana = 5 }
 builders.max = 2
 builders.cost = { gold = 50 }
 
-[tiles]                          # legend; these four are the defaults
-"." = ["ground", "air", "unit"]            # path
-"#" = ["air", "unit", "build"]             # buildable ground
-"=" = ["ground", "air", "unit", "build"]   # mazing ground
-" " = []                                   # blocked, even for air
+[legend]                         # char to tile kind id; this is the default
+"." = "path"
+"#" = "grass"
+"=" = "field"                    # mazing ground
+"~" = "water"
+"^" = "cliff"
+" " = "void"
 
 [[lane]]
 owner = "player"                 # one lane per player
@@ -200,8 +226,8 @@ Stat tables declare costs as a table of resource name to amount, so a tower
 can cost `{ gold = 40, mana = 10 }` and the engine checks and deducts
 whatever is listed. See the stat tables section below.
 
-Base data (`data/*.toml`) is shared: a pack can add units and structures but
-does not redefine the base ones. Everything else is decided per map through
+Base data is shared: a pack adds units, structures, tile kinds and VFX
+presets under new ids and references base ids for the rest. Everything else is decided per map through
 module choice and `[params]`.
 
 ### Stat tables (`data/*.toml`)
