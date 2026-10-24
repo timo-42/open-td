@@ -195,23 +195,85 @@ interval = 0.5
 ```
 
 Stat tables declare costs as a table of resource name to amount, so a tower
-can cost `{ gold = 40, mana = 10 }` on one map's data and the engine checks
-and deducts whatever is listed:
-
-```toml
-[[structure]]
-id = "arcane_tower"
-cost = { gold = 40, mana = 10 }
-range = 3.5
-damage = 12
-cooldown = 0.8
-targets = ["ground", "air"]
-blocks = ["ground"]              # a sky wall would list ["ground", "air"]
-```
+can cost `{ gold = 40, mana = 10 }` and the engine checks and deducts
+whatever is listed. See the stat tables section below.
 
 Base data (`data/*.toml`) is shared: a pack can add units and structures but
 does not redefine the base ones. Everything else is decided per map through
 module choice and `[params]`.
+
+### Stat tables (`data/*.toml`)
+
+Units and structures are data. The engine implements every attribute below in
+Rust because they run every tick. Decisions (unlocks, build limits, income,
+crits, on-kill effects) are not here; modules do those through events and
+commands.
+
+Structure kind:
+
+| Attribute | Notes |
+|---|---|
+| `id`, `name`, `sprite` | the engine never reads `sprite`; the client does |
+| `cost` | resource name to amount |
+| `size` | footprint in tiles, default `1`; `2` means 2x2 |
+| `blocks`, `targets` | tile flag masks |
+| `range` | tiles, measured from the footprint centre |
+| `damage`, `cooldown`, `damage_type` | per shot; `damage_type` is a key in the pack's damage-vs-armor table, default `normal` |
+| `targeting` | `first`, `last`, `nearest`, `strongest`, `weakest`; the player may switch it |
+| `projectile` | absent means instant hit; otherwise speed in tiles per second, and a projectile whose target dies first is wasted |
+| `splash`, `splash_falloff` | radius in tiles and damage percent at the edge; absent means single target |
+| `build_time` | seconds, default `0`; builder modules rely on it |
+| `sell_value` | fraction of cost; default comes from map params |
+| `upgrades_to` | structure ids; upgrade replaces in place |
+| `hp`, `armor`, `armor_type` | optional; a structure without `hp` cannot be targeted |
+| `on_hit` | list of effects applied to the target |
+| `aura` | an effect list with a radius and a filter (`allies`, `enemies`), applied continuously |
+
+Unit kind:
+
+| Attribute | Notes |
+|---|---|
+| `id`, `name`, `sprite` | |
+| `hp`, `speed`, `armor`, `armor_type` | speed in tiles per second |
+| `moves_on` | tile flag mask; `["air"]` is a flyer |
+| `size` | `small`, `medium`, `large` for targeting and sprites |
+| `bounty` | resource name to amount, paid by the `income` module, not the engine |
+| `immune_to` | effect kinds this unit ignores |
+| `attack` | optional `{ range, damage, cooldown, targets }` so sent creeps can hit structures with `hp` |
+
+Effects are data too. Each has a `kind`, a duration in seconds, and kind
+parameters. The engine ships these kinds: `slow` (percent), `dot` (damage per
+second), `stun`, `armor` (flat modifier, may be negative), `bounce` (count and
+damage falloff). The strongest effect of a kind wins; a reapplication
+refreshes its duration.
+
+```toml
+[[structure]]
+id = "frost_tower"
+cost = { gold = 60 }
+range = 3
+damage = 8
+cooldown = 1.0
+damage_type = "magic"
+targets = ["ground", "air"]
+projectile = 12
+on_hit = [{ kind = "slow", percent = 40, duration = 2.0 }]
+upgrades_to = ["blizzard_tower"]
+
+[[unit]]
+id = "wyvern"
+hp = 300
+speed = 2.5
+armor = 2
+armor_type = "light"
+moves_on = ["air"]
+size = "medium"
+bounty = { gold = 12 }
+
+[damage]                          # multiplier table, rows are damage types
+normal = { light = 1.0, heavy = 1.0, fortified = 0.7 }
+magic  = { light = 1.25, heavy = 0.75, fortified = 0.5 }
+```
 
 ### Generated maps
 
