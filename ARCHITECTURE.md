@@ -19,6 +19,8 @@ as wasm too (written in Rust, compiled to `wasm32-unknown-unknown`).
 | Engine | Bevy 0.20 (pinned) for the client; plain Rust for the sim | Runs on all 4 targets |
 | Rendering | Top-down 2D sprites on a square grid; ranges and paths as overlays | Modders ship a PNG, not a rigged model; stays fast in the browser; TD is read as a grid. Isometric looks are an art choice, not an engine mode. 3D would be a separate client against the same sim |
 | Simulation | `td_core`, fixed tick (30 Hz), deterministic, players and teams from day one | Headless tests, replays, lockstep multiplayer later |
+| Web graphics | WebGL2 only; shaders and features stay within WebGL2 limits | Reaches every browser; 2D needs nothing more; Bevy picks the backend at compile time, so one wasm artifact. A WebGPU build can be added later as a second artifact with a loader fallback |
+| Particles | Small in-house 2D system in `td_client`, CPU-simulated, sprite-batched, presets defined in pack data (`data/vfx.toml`) | bevy_hanabi needs compute shaders, which WebGL2 lacks; our counts are small; presets as data let modders add fire, lightning, wind, debris with sprite sheets. Never touches `td_core` |
 | Rules | wasm modules run by **wasmi** on every target, fuel-metered | Pure Rust host, runs in the browser too, sandboxed, runaway code stops deterministically |
 | Stat tables | TOML inside the pack | Units and structures are data; no code needed to add a tower |
 | Mod ABI | Hand-written core-wasm ABI, MessagePack payloads | Language-neutral, works in wasmi |
@@ -221,6 +223,7 @@ Structure kind:
 | `damage`, `cooldown`, `damage_type` | per shot; `damage_type` is a key in the pack's damage-vs-armor table, default `normal` |
 | `targeting` | `first`, `last`, `nearest`, `strongest`, `weakest`; the player may switch it |
 | `projectile` | absent means instant hit; otherwise speed in tiles per second, and a projectile whose target dies first is wasted |
+| `vfx` | optional `{ attack, projectile, hit }` preset ids from `data/vfx.toml`; client-only |
 | `splash`, `splash_falloff` | radius in tiles and damage percent at the edge; absent means single target |
 | `build_time` | seconds, default `0`; builder modules rely on it |
 | `sell_value` | fraction of cost; default comes from map params |
@@ -241,8 +244,8 @@ Unit kind:
 | `immune_to` | effect kinds this unit ignores |
 | `attack` | optional `{ range, damage, cooldown, targets }` so sent creeps can hit structures with `hp` |
 
-Effects are data too. Each has a `kind`, a duration in seconds, and kind
-parameters. The engine ships these kinds: `slow` (percent), `dot` (damage per
+Effects are data too. Each has a `kind`, a duration in seconds, an optional
+`vfx` preset shown on the affected unit, and kind parameters. The engine ships these kinds: `slow` (percent), `dot` (damage per
 second), `stun`, `armor` (flat modifier, may be negative), `bounce` (count and
 damage falloff). The strongest effect of a kind wins; a reapplication
 refreshes its duration.
