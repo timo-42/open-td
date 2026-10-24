@@ -48,6 +48,22 @@ mods (no instruction limit; possible later as a second backend).
 
 - **Lanes**: a map has one or more lanes, each a tile grid with spawn and exit
   tiles. A lane has an owner (a player, a team, or shared).
+- **Tiles** carry a set of flags, nothing else:
+
+  | Flag | Meaning |
+  |---|---|
+  | `ground` | ground units may walk here |
+  | `air` | flying units may move here |
+  | `unit` | player-controlled units (builders, heroes) may walk here |
+  | `build` | structures may be placed here |
+
+  Every unit kind has a `moves_on` mask and every structure a `targets` mask.
+  Pathfinding is one algorithm: a flow field per mask in use, computed from
+  the exit over tiles matching the mask. A flyer is a unit whose mask is
+  `air`; it is not a special case anywhere else. Placing a structure clears
+  `ground` on its tile (not `air`), the affected flow fields are recomputed,
+  and a placement that would leave a spawn with no route is refused. That is
+  all a mazing map needs.
 - **Players and teams**: every command carries the issuing player. The engine
   only checks ownership; rules decide the rest.
 - **Resources**: named integer counters per player and per team. Names are
@@ -155,6 +171,12 @@ income.start = { gold = 100, mana = 0 }
 income.per_wave = { gold = 20, mana = 5 }
 builders.max = 2
 builders.cost = { gold = 50 }
+
+[tiles]                          # legend; these four are the defaults
+"." = ["ground", "air", "unit"]            # path
+"#" = ["air", "unit", "build"]             # buildable ground
+"=" = ["ground", "air", "unit", "build"]   # mazing ground
+" " = []                                   # blocked, even for air
 
 [[lane]]
 owner = "player"                 # one lane per player
