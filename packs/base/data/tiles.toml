@@ -1,0 +1,45 @@
+# Tile kinds. The engine only sees the flags:
+#   ground: ground units walk here   air: flyers move here
+#   unit:   builders walk here       build: structures may be placed here
+
+[[tile]]
+id = "grass"
+flags = ["build", "unit", "air"]
+color = "#3d7a3a"
+sprite = "tiles/grass.png"
+
+[[tile]]
+id = "path"
+flags = ["ground", "unit", "air"]
+color = "#b39a6b"
+sprite = "tiles/path.png"
+
+[[tile]]
+id = "field"
+name = "Mazing ground"
+flags = ["ground", "build", "unit", "air"]
+color = "#6e9150"
+sprite = "tiles/field.png"
+
+[[tile]]
+id = "dirt"
+flags = ["ground", "unit", "air"]
+color = "#8a6a46"
+sprite = "tiles/dirt.png"
+
+[[tile]]
+id = "cliff"
+flags = ["air"]
+color = "#6a6a70"
+sprite = "tiles/cliff.png"
+
+[[tile]]
+id = "water"
+flags = ["air"]
+color = "#2e5e9e"
+sprite = "tiles/water.png"
+
+[[tile]]
+id = "void"
+flags = []
+color = "#0d0d12"

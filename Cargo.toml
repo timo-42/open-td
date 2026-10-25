@@ -1,0 +1,69 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/td_mod_api",
+    "crates/td_mod_sdk",
+    "crates/td_core",
+    "crates/td_content",
+    "crates/td_mods",
+    "crates/td_headless",
+    "crates/td_client",
+    "modules/waves",
+    "modules/lives",
+    "modules/income",
+    "modules/versus",
+    "modules/builders",
+    "modules/canyon_gen",
+    "xtask",
+]
+default-members = [
+    "crates/td_mod_api",
+    "crates/td_core",
+    "crates/td_content",
+    "crates/td_mods",
+    "crates/td_headless",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/haastimo/open-td"
+
+[workspace.dependencies]
+td_mod_api = { path = "crates/td_mod_api" }
+td_mod_sdk = { path = "crates/td_mod_sdk" }
+td_core = { path = "crates/td_core" }
+td_content = { path = "crates/td_content" }
+td_mods = { path = "crates/td_mods" }
+serde = { version = "1", default-features = false, features = ["derive", "alloc"] }
+rmp-serde = "1.3"
+toml = "1"
+zip = { version = "9", default-features = false, features = ["deflate"] }
+wasmi = { version = "2", default-features = false, features = ["std", "stable", "validate", "auto-dispatch", "deterministic"] }
+
+[profile.dev.package."*"]
+opt-level = 2
+
+# The browser build: small over fast.
+[profile.web]
+inherits = "release"
+opt-level = "s"
+lto = "thin"
+codegen-units = 1
+strip = true
+
+[profile.wasm-module]
+inherits = "release"
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# wasmi's interpreter loop relies on sibling-call optimisation; debug
+# assertions in dev builds defeat it and the stack overflows.
+[profile.dev.package.wasmi]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false

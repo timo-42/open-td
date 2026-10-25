@@ -1,0 +1,100 @@
+# Two players on two teams. Waves hit both lanes; send creeps to your
+# opponent with the "send" buttons. Each send raises your income. Last
+# player with lives wins.
+
+[map]
+name = "Duel"
+modules = ["waves", "lives", "income", "versus"]
+players = 2
+teams = 2
+
+[params]
+lives.start = 25
+income.start = { gold = 150 }
+income.per_wave = { gold = 30 }
+
+[params.waves]
+first_delay = 25
+delay = 30
+
+[[lane]]
+owner = "player"
+grid = """
+S.......#####
+#######.#####
+#.......#####
+#.###########
+#..........E#
+"""
+
+[[wave]]
+unit = "grunt"
+count = 10
+interval = 0.8
+hp_percent = 100
+
+[[wave]]
+unit = "runner"
+count = 12
+interval = 0.5
+hp_percent = 120
+
+[[wave]]
+unit = "wolf"
+count = 12
+interval = 0.7
+hp_percent = 140
+
+[[wave]]
+unit = "knight"
+count = 8
+interval = 1.2
+hp_percent = 160
+
+[[wave]]
+unit = "bat"
+count = 12
+interval = 0.7
+hp_percent = 180
+
+[[wave]]
+unit = "golem"
+count = 8
+interval = 1.5
+hp_percent = 200
+
+[[wave]]
+unit = "wolf"
+count = 20
+interval = 0.4
+hp_percent = 220
+
+[[wave]]
+unit = "knight"
+count = 14
+interval = 0.9
+hp_percent = 240
+
+[[wave]]
+unit = "wyvern"
+count = 8
+interval = 1.1
+hp_percent = 260
+
+[[wave]]
+unit = "golem"
+count = 12
+interval = 1.2
+hp_percent = 280
+
+[[wave]]
+unit = "dragon"
+count = 1
+interval = 1.0
+hp_percent = 300
+
+[[wave]]
+unit = "ogre"
+count = 2
+interval = 3.0
+hp_percent = 320

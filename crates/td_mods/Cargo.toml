@@ -1,0 +1,14 @@
+[package]
+name = "td_mods"
+description = "open-td wasm rule module host (wasmi, fuel-metered)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+td_mod_api = { workspace = true }
+td_core = { workspace = true }
+wasmi = { workspace = true }
+
+[dev-dependencies]
+wat = "1"

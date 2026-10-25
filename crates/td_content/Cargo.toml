@@ -1,0 +1,19 @@
+[package]
+name = "td_content"
+description = "open-td packs: info.toml, stat tables, maps, zip reading, validation, game assembly"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = ["fs"]
+# Read packs from directories and zip files on disk.
+fs = []
+
+[dependencies]
+td_mod_api = { workspace = true }
+td_core = { workspace = true }
+td_mods = { workspace = true }
+serde = { workspace = true, features = ["std"] }
+toml = { workspace = true }
+zip = { workspace = true }

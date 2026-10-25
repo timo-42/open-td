@@ -1,0 +1,148 @@
+# Client-side particle presets. Styles: burst (from a point), beam (from
+# attacker to target), trail (behind a projectile).
+
+[[vfx]]
+id = "arrow"
+style = "trail"
+color = "#e8d8b0"
+count = 1
+lifetime = 0.15
+speed = 0
+size = 0.06
+
+[[vfx]]
+id = "bolt"
+style = "trail"
+color = "#a0e0ff"
+color_end = "#2060ff"
+count = 2
+lifetime = 0.25
+speed = 0.3
+size = 0.1
+size_end = 0.02
+
+[[vfx]]
+id = "shell"
+style = "trail"
+color = "#606060"
+color_end = "#20202000"
+count = 1
+lifetime = 0.35
+speed = 0.2
+size = 0.08
+size_end = 0.16
+
+[[vfx]]
+id = "poison"
+style = "burst"
+color = "#80e040"
+color_end = "#20600000"
+count = 4
+lifetime = 0.5
+speed = 0.6
+size = 0.08
+gravity = -0.8
+
+[[vfx]]
+id = "spark"
+color = "#fff0a0"
+color_end = "#ff800000"
+count = 6
+lifetime = 0.2
+speed = 3
+size = 0.05
+
+[[vfx]]
+id = "fire"
+color = "#ffd040"
+color_end = "#c0200000"
+count = 14
+lifetime = 0.45
+speed = 1.6
+size = 0.14
+size_end = 0.04
+gravity = -1.5
+drag = 2
+
+[[vfx]]
+id = "explosion"
+color = "#fff080"
+color_end = "#a0100000"
+count = 24
+lifetime = 0.6
+speed = 2.6
+size = 0.2
+size_end = 0.05
+gravity = -1.0
+drag = 3
+
+[[vfx]]
+id = "smoke"
+color = "#a0a0a0c0"
+color_end = "#40404000"
+count = 5
+lifetime = 0.7
+speed = 0.5
+size = 0.12
+size_end = 0.3
+gravity = -0.6
+drag = 1
+
+[[vfx]]
+id = "frost"
+color = "#e0f8ff"
+color_end = "#60b0ff00"
+count = 6
+lifetime = 0.4
+speed = 0.8
+size = 0.07
+
+[[vfx]]
+id = "lightning"
+style = "beam"
+color = "#e0d0ff"
+color_end = "#8040ff00"
+count = 8
+lifetime = 0.18
+size = 0.06
+
+[[vfx]]
+id = "wind"
+color = "#ffffff80"
+color_end = "#ffffff00"
+count = 1
+lifetime = 0.5
+speed = 1.2
+spread = 40
+size = 0.05
+
+[[vfx]]
+id = "debris"
+color = "#8a6438"
+color_end = "#4a341800"
+count = 16
+lifetime = 0.7
+speed = 2.2
+size = 0.1
+gravity = 4
+drag = 1
+
+[[vfx]]
+id = "death"
+color = "#d04040"
+color_end = "#40000000"
+count = 10
+lifetime = 0.45
+speed = 1.4
+size = 0.09
+drag = 2
+
+[[vfx]]
+id = "leak"
+color = "#ff4040"
+color_end = "#ff000000"
+count = 16
+lifetime = 0.6
+speed = 1.0
+size = 0.12
+size_end = 0.3

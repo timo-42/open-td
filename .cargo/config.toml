@@ -1,0 +1,6 @@
+[alias]
+xtask = "run --quiet -p xtask --"
+
+[target.wasm32-unknown-unknown]
+# getrandom (pulled in by Bevy) needs to know it runs in a browser.
+rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]

@@ -1,0 +1,15 @@
+[package]
+name = "td_headless"
+description = "Run open-td packs without a window: tests, balance runs, bots, replays"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+td_mod_api = { workspace = true }
+td_core = { workspace = true }
+td_content = { workspace = true }
+serde = { workspace = true, features = ["std"] }
+
+[dev-dependencies]
+td_mods = { workspace = true }

@@ -1,0 +1,4 @@
+/target
+/dist
+packs/base/modules/*.wasm
+*.zip

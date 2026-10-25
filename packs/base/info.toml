@@ -1,0 +1,60 @@
+id = "base"
+name = "open-td base pack"
+version = "0.1.0"
+api_version = 1
+author = "open-td contributors"
+description = "Default tiles, towers, creeps, builders, VFX and rule modules every map can use."
+
+# What a map gets when it leaves something out.
+[defaults]
+modules = ["waves", "lives", "income", "builders"]
+players = 1
+
+[defaults.params]
+sell_value = 0.75
+
+[defaults.params.waves]
+first_delay = 20
+delay = 22
+
+[defaults.params.lives]
+resource = "lives"
+scope = "player"
+start = 20
+
+[defaults.params.income]
+start = { gold = 150 }
+per_wave = { gold = 35 }
+bounty = true
+
+[defaults.params.builders]
+unit = "peasant"
+start = 1
+max = 3
+cost = { gold = 60 }
+
+[defaults.params.versus]
+units = { grunt = { gold = 8 }, runner = { gold = 10 }, wolf = { gold = 18 }, bat = { gold = 20 }, knight = { gold = 35 }, sapper = { gold = 40 }, golem = { gold = 70 } }
+income = { grunt = { gold = 1 }, runner = { gold = 1 }, wolf = { gold = 2 }, bat = { gold = 2 }, knight = { gold = 4 }, sapper = { gold = 4 }, golem = { gold = 8 } }
+
+[defaults.legend]
+"." = "path"
+"#" = "grass"
+"=" = "field"
+":" = "dirt"
+"~" = "water"
+"^" = "cliff"
+" " = "void"
+
+[[generator]]
+id = "random_canyon"
+name = "Random canyon"
+module = "modules/canyon_gen.wasm"
+params = [
+  { name = "style", type = "choice", options = ["canyon", "maze"], default = "canyon" },
+  { name = "width", type = "int", min = 10, max = 40, default = 20 },
+  { name = "height", type = "int", min = 7, max = 25, default = 11 },
+  { name = "lanes", label = "players", type = "int", min = 1, max = 4, default = 1 },
+  { name = "waves", type = "int", min = 5, max = 50, default = 15 },
+  { name = "seed", type = "int", min = 0, max = 999999, default = 0 },
+]

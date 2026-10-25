@@ -1,0 +1,200 @@
+# Towers, walls and buildings. Range is in tiles from the footprint centre,
+# cooldown in seconds, projectile speed in tiles per second.
+
+[[structure]]
+id = "arrow_tower"
+name = "Arrow tower"
+cost = { gold = 40 }
+range = 3.5
+damage = 13
+cooldown = 0.8
+damage_type = "pierce"
+targets = ["ground", "air"]
+projectile = 14
+color = "#c8a060"
+vfx = { projectile = "arrow", hit = "spark" }
+upgrades_to = ["longbow_tower"]
+
+[[structure]]
+id = "longbow_tower"
+name = "Longbow tower"
+cost = { gold = 85 }
+range = 4.5
+damage = 30
+cooldown = 0.7
+damage_type = "pierce"
+targets = ["ground", "air"]
+projectile = 18
+color = "#e0b070"
+vfx = { projectile = "arrow", hit = "spark" }
+
+[[structure]]
+id = "cannon_tower"
+name = "Cannon tower"
+cost = { gold = 70 }
+range = 3.0
+damage = 32
+cooldown = 1.6
+damage_type = "siege"
+targets = ["ground"]
+projectile = 8
+splash = 1.2
+splash_falloff = 40
+color = "#505058"
+vfx = { attack = "smoke", projectile = "shell", hit = "fire" }
+upgrades_to = ["mortar_tower"]
+
+[[structure]]
+id = "mortar_tower"
+name = "Mortar tower"
+cost = { gold = 140 }
+range = 3.8
+damage = 75
+cooldown = 1.8
+damage_type = "siege"
+targets = ["ground"]
+projectile = 7
+splash = 1.6
+splash_falloff = 40
+color = "#38383f"
+vfx = { attack = "smoke", projectile = "shell", hit = "explosion" }
+
+[[structure]]
+id = "frost_tower"
+name = "Frost tower"
+cost = { gold = 60 }
+range = 3
+damage = 8
+cooldown = 1.0
+damage_type = "magic"
+targets = ["ground", "air"]
+projectile = 12
+color = "#80c8f0"
+vfx = { projectile = "bolt", hit = "frost" }
+on_hit = [{ kind = "slow", percent = 40, duration = 2.0, vfx = "frost" }]
+upgrades_to = ["blizzard_tower"]
+
+[[structure]]
+id = "blizzard_tower"
+name = "Blizzard tower"
+cost = { gold = 120 }
+range = 3.5
+damage = 18
+cooldown = 1.0
+damage_type = "magic"
+targets = ["ground", "air"]
+projectile = 12
+splash = 1.5
+splash_falloff = 60
+color = "#b0e8ff"
+vfx = { projectile = "bolt", hit = "frost" }
+on_hit = [{ kind = "slow", percent = 55, duration = 2.5, vfx = "frost" }]
+
+[[structure]]
+id = "arcane_tower"
+name = "Arcane tower"
+cost = { gold = 95 }
+range = 3.5
+damage = 24
+cooldown = 1.2
+damage_type = "magic"
+targets = ["ground", "air"]
+color = "#a060e0"
+vfx = { attack = "lightning", hit = "spark" }
+on_hit = [{ kind = "bounce", count = 3, falloff = 70, range = 2.5 }]
+upgrades_to = ["storm_tower"]
+
+[[structure]]
+id = "storm_tower"
+name = "Storm tower"
+cost = { gold = 180 }
+range = 4
+damage = 45
+cooldown = 1.1
+damage_type = "magic"
+targets = ["ground", "air"]
+color = "#c890ff"
+vfx = { attack = "lightning", hit = "spark" }
+on_hit = [
+  { kind = "bounce", count = 5, falloff = 75, range = 2.8 },
+  { kind = "stun", duration = 0.3 },
+]
+
+[[structure]]
+id = "poison_tower"
+name = "Poison tower"
+cost = { gold = 55 }
+range = 3.2
+damage = 4
+cooldown = 1.0
+damage_type = "normal"
+targets = ["ground"]
+projectile = 10
+color = "#60b040"
+vfx = { projectile = "poison", hit = "poison" }
+on_hit = [
+  { kind = "dot", dps = 12, duration = 3.0, vfx = "poison" },
+  { kind = "armor", amount = -2, duration = 3.0 },
+]
+
+[[structure]]
+id = "wind_shrine"
+name = "Wind shrine"
+cost = { gold = 80 }
+color = "#d0e8d0"
+targets = []
+aura = { radius = 2.5, filter = "enemies", effects = [{ kind = "slow", percent = 25, vfx = "wind" }] }
+
+[[structure]]
+id = "war_drum"
+name = "War drum"
+cost = { gold = 110 }
+color = "#c06040"
+aura = { radius = 2.5, filter = "allies", effects = [
+  { kind = "haste", percent = 25 },
+  { kind = "damage", percent = 15 },
+] }
+
+[[structure]]
+id = "siege_engine"
+name = "Siege engine"
+cost = { gold = 220 }
+size = 2
+range = 5
+damage = 140
+cooldown = 2.6
+damage_type = "siege"
+targets = ["ground"]
+projectile = 9
+splash = 2.0
+splash_falloff = 30
+build_time = 4
+color = "#6a4a30"
+vfx = { attack = "smoke", projectile = "shell", hit = "explosion" }
+
+# Mazing pieces. Walls with hp can be broken by creeps that attack.
+
+[[structure]]
+id = "house"
+name = "House"
+cost = { gold = 8 }
+hp = 150
+color = "#a07850"
+
+[[structure]]
+id = "palisade"
+name = "Palisade"
+cost = { gold = 5 }
+hp = 300
+armor = 1
+color = "#8a6438"
+
+[[structure]]
+id = "stone_wall"
+name = "Stone wall"
+cost = { gold = 20 }
+hp = 1200
+armor = 5
+blocks = ["ground", "air"]
+color = "#9a9aa0"
+build_time = 1

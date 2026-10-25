@@ -1,0 +1,73 @@
+# The smallest kind of map: a grid and a wave table. Modules, params and
+# legend all come from the base pack defaults.
+
+[map]
+name = "First Steps"
+
+[[lane]]
+grid = """
+S.....#############~~
+#####.#############~~
+#####.......########^
+###########.########^
+##..........###^^####
+##.#############^####
+##.####~~##########^#
+##.####~~###.......##
+##.#########.#####.##
+##...........#####.##
+#################...E
+"""
+
+[[wave]]
+unit = "grunt"
+count = 10
+interval = 0.9
+
+[[wave]]
+unit = "runner"
+count = 12
+interval = 0.6
+
+[[wave]]
+unit = "wolf"
+count = 12
+interval = 0.8
+
+[[wave]]
+unit = "grunt"
+count = 20
+interval = 0.5
+hp_percent = 140
+
+[[wave]]
+unit = "bat"
+count = 12
+interval = 0.8
+
+[[wave]]
+unit = "knight"
+count = 10
+interval = 1.2
+
+[[wave]]
+unit = "wolf"
+count = 18
+interval = 0.6
+hp_percent = 160
+
+[[wave]]
+unit = "golem"
+count = 8
+interval = 1.6
+
+[[wave]]
+unit = "wyvern"
+count = 8
+interval = 1.2
+
+[[wave]]
+unit = "ogre"
+count = 1
+interval = 1.0
+name = "Boss: Ogre warlord"

@@ -1,0 +1,12 @@
+[package]
+name = "versus"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+td_mod_sdk = { workspace = true }
