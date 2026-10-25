@@ -1,0 +1,69 @@
+# Four players, one lane each, one shared pool of lives.
+
+[map]
+name = "Crossroads"
+modules = ["waves", "lives", "income", "builders"]
+players = 4
+
+[params]
+lives.resource = "castle_health"
+lives.scope = "team"
+lives.start = 40
+income.start = { gold = 150, mana = 0 }
+income.per_wave = { gold = 35, mana = 5 }
+builders.max = 2
+builders.cost = { gold = 50 }
+
+[[lane]]
+owner = "player"
+grid = """
+S....##############
+####.##############
+####.......########
+##########.########
+###=======.======##
+###=######.#####=##
+###=######......=.E
+###=============###
+"""
+
+[[wave]]
+unit = "grunt"
+count = 8
+interval = 0.8
+
+[[wave]]
+unit = "wolf"
+count = 10
+interval = 0.8
+
+[[wave]]
+unit = "runner"
+count = 16
+interval = 0.4
+
+[[wave]]
+unit = "bat"
+count = 10
+interval = 0.7
+
+[[wave]]
+unit = "knight"
+count = 6
+interval = 1.2
+
+[[wave]]
+unit = "golem"
+count = 5
+interval = 1.5
+
+[[wave]]
+unit = "wyvern"
+count = 6
+interval = 1.2
+
+[[wave]]
+unit = "dragon"
+count = 1
+interval = 1.0
+name = "Boss: Dragon"

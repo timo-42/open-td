@@ -1,0 +1,80 @@
+# A mazing map: the whole field is walkable and buildable. Walls and
+# houses shape the path; a placement that would seal it is refused. Sappers
+# and the ogre attack the walls they pass, so mazes wear down.
+
+[map]
+name = "Open Field"
+modules = ["waves", "lives", "income", "builders"]
+
+[params.income]
+start = { gold = 220 }
+per_wave = { gold = 45 }
+
+[[lane]]
+grid = """
+#===================#
+#===================#
+#===================#
+S===================E
+#===================#
+#===================#
+#===================#
+"""
+
+[[wave]]
+unit = "grunt"
+count = 12
+interval = 0.8
+
+[[wave]]
+unit = "runner"
+count = 14
+interval = 0.5
+
+[[wave]]
+unit = "wolf"
+count = 14
+interval = 0.7
+
+[[wave]]
+unit = "sapper"
+count = 8
+interval = 1.2
+
+[[wave]]
+unit = "knight"
+count = 12
+interval = 1.0
+
+[[wave]]
+unit = "bat"
+count = 14
+interval = 0.6
+
+[[wave]]
+unit = "golem"
+count = 10
+interval = 1.4
+
+[[wave]]
+unit = "sapper"
+count = 14
+interval = 0.9
+hp_percent = 150
+
+[[wave]]
+unit = "wyvern"
+count = 10
+interval = 1.0
+
+[[wave]]
+unit = "ogre"
+count = 1
+interval = 1.0
+name = "Boss: Ogre warlord"
+
+[[wave]]
+unit = "dragon"
+count = 1
+interval = 1.0
+name = "Boss: Dragon"

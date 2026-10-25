@@ -1,0 +1,10 @@
+[package]
+name = "td_mod_sdk"
+description = "Guest-side helpers for writing open-td rule modules in Rust"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+td_mod_api = { workspace = true }
+serde = { workspace = true }

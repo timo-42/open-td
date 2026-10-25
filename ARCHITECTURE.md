@@ -99,36 +99,52 @@ Events the engine emits (each is a hook a module can implement):
 
 | Event | When |
 |---|---|
-| `GameStart { players, teams, lanes }` | first tick |
+| `GameStart { players, lanes }` | first tick; each player carries its team |
 | `Tick { n }` | every tick, **opt-in** (costs fuel each tick) |
 | `Timer { id }` | a timer requested by this module fired |
 | `UnitSpawned { unit, kind, owner, lane }` | |
-| `UnitDied { unit, kind, owner, lane, killer }` | killer is a structure or unit |
+| `UnitDied { unit, kind, owner, lane, killer, killer_owner }` | killer is a structure or unit; `killer_owner` saves bounty modules from tracking structures |
 | `UnitReachedExit { unit, kind, owner, lane }` | engine removes the unit; rules decide the consequence |
 | `UnitArrived { unit, at }` | a unit ordered to a cell got there (builders) |
-| `StructureBuilt { structure, kind, owner, at }` | |
+| `StructureBuilt { structure, kind, owner, at }` | placed (after `build_time`) or upgraded |
 | `StructureSold { structure, owner }` | |
+| `StructureDestroyed { structure, kind, owner, killer }` | a structure with `hp` was broken by a unit |
 | `ResourceChanged { scope, name, value, delta }` | scope is a player or a team |
-| `PlayerRequest { player, request }` | UI actions the engine doesn't define: `buy_builder`, `send_monster`, `upgrade` … forwarded verbatim |
+| `PlayerRequest { player, request, data }` | UI actions the engine doesn't define: `buy_builder`, `send_monster`, `next_wave` … forwarded verbatim |
 | `PlayerLeft { player }` | |
+| `Signal { name, data }` | broadcast by a module's `Signal` command; how modules talk (`waves` signals `wave` and `waves_done`, `lives` ends the game on `waves_done`, `versus` raises income with `income_bonus`) |
 
 Commands a module (or the player's input layer) can issue:
 
 | Command | Effect |
 |---|---|
-| `Spawn { kind, lane, owner, hp_percent }` | create a unit at a lane spawn |
+| `Spawn { kind, lane, owner, hp_percent, at?, idle }` | create a unit at a lane spawn (or `at`); an `idle` unit waits for orders instead of walking to the exit |
 | `OrderMove { unit, to }` | walk a unit to a cell |
-| `Build { kind, at, owner, builder? }` | place a structure, optionally requiring a builder to walk there first |
+| `Build { kind, at, owner, builder? }` | place a structure, optionally requiring a builder to walk there first; a builder already on its way queues the order (`OrderMove` clears the queue) |
 | `Sell { structure }` | |
+| `Upgrade { structure, to }` | replace in place with one of its `upgrades_to`, paying its cost |
+| `SetTargeting { structure, mode }` | |
 | `AddResource { scope, name, delta }` | any name; scope is a player or a team; fails if it would go negative unless `allow_negative` |
+| `Purchase { scope, cost, then, notify? }` | deduct `cost` and run the `then` commands, or tell `notify` it can't be afforded; one atomic step, so modules need not mirror balances |
 | `SetTimer { id, ticks, repeat }`, `CancelTimer { id }` | |
 | `SetAllowed { player, structures: [...] }` | restrict the build palette |
+| `SetRequireBuilder { player, required }` | `Build` from this player must name one of their units |
+| `SetTickEvents { enabled }` | opt in to `Tick` |
 | `Message { to, text }` | HUD text |
+| `Signal { name, data }` | broadcast a `Signal` event to every module |
+| `Request { request, data }` | players only: becomes a `PlayerRequest` |
 | `EndGame { result }` | result lists winners and losers; first module to end the game wins |
 
-Order inside one tick: apply queued commands → move units → structures attack
-→ resolve deaths and exits → emit events → call modules → queue their commands
-for the next tick. Deterministic given the same command log.
+Players may issue `OrderMove`, `Build`, `Sell`, `Upgrade`, `SetTargeting` and
+`Request`, and only for what they own; modules may issue anything. A refused
+player command becomes a HUD message.
+
+Order inside one tick: apply queued commands → timers → construction → move
+units → effects and auras → structures attack, projectiles fly, units attack
+→ resolve deaths and exits → emit events → call modules (in list order) →
+queue their commands for the next tick. Deterministic given the same command
+log: the simulation uses `f64` with only `+ - * /` and `sqrt` (bit-exact under
+IEEE 754 on every target), ordered containers, and a seeded SplitMix64.
 
 ## Game modes are just rule modules
 
@@ -295,8 +311,9 @@ Unit kind:
 Effects are data too. Each has a `kind`, a duration in seconds, an optional
 `vfx` preset shown on the affected unit, and kind parameters. The engine ships these kinds: `slow` (percent), `dot` (damage per
 second), `stun`, `armor` (flat modifier, may be negative), `bounce` (count and
-damage falloff). The strongest effect of a kind wins; a reapplication
-refreshes its duration.
+damage falloff), plus `damage` and `haste` (percent) for ally auras on
+structures. The strongest effect of a kind wins; a reapplication refreshes
+its duration.
 
 ```toml
 [[structure]]
@@ -348,13 +365,18 @@ params = [
 Guest exports: `memory`, `td_abi_version() -> u32`, `td_alloc(len) -> ptr`,
 `td_free(ptr, len)`, plus any of:
 
-- `td_init(ptr, len) -> i64`: map `[params]` in, nothing out (module state setup)
+- `td_init(ptr, len) -> i64`: `ModuleInit` in (the module's `[params.<name>]`
+  over the pack defaults, all params, the map's extra tables such as `wave`,
+  the raw stat tables and the players), nothing out
 - `td_on_event(ptr, len) -> i64`: `Event` in, `Vec<Command>` out
 - `td_generate_map(ptr, len) -> i64`: generator params in, `Map` out
 
-Returns pack `ptr << 32 | len`. Host imports (module `td`): `log(ptr, len)`,
-`random() -> u64` (seeded, deterministic). Each call has a fuel budget; a
-module that traps or runs dry is disabled and the player is told.
+Returns pack `ptr << 32 | len` (`0` is nothing, negative an error). Payloads
+are MessagePack with named struct fields and externally tagged enums. Host
+imports (module `td`): `log(ptr, len)`, `random() -> u64` (seeded per module,
+deterministic). Each call has a fuel budget; a module that traps, runs dry,
+returns garbage or outgrows its memory cap is disabled and the players are
+told.
 
 ## Workspace
 
@@ -362,15 +384,16 @@ module that traps or runs dry is disabled and the player is told.
 crates/
   td_mod_api/   Event, Command, Map, Params types + ABI docs (no_std)
   td_mod_sdk/   guest helpers: export_module!(init, on_event, generate_map)
-  td_core/      engine kernel
+  td_core/      engine kernel (Sim) and Game (Sim + rule modules)
   td_content/   info.toml, data and map TOML, zip reading, validation
   td_mods/      wasmi host
-  td_headless/  run a pack without a window (tests, balance, bots)
+  td_headless/  run a pack without a window (tests, balance, bots, replays)
   td_client/    Bevy app: rendering, input, HUD, generator forms
 modules/        base rule modules, each a cdylib for wasm32-unknown-unknown
   waves/ lives/ income/ versus/ builders/ canyon_gen/
 packs/
   base/         base data, starter maps, built modules
+xtask/          cargo xtask modules | pack | web
 ```
 
 ## Web build notes

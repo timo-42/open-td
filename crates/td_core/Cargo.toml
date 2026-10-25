@@ -1,0 +1,13 @@
+[package]
+name = "td_core"
+description = "open-td engine kernel: deterministic fixed-tick tower defense simulation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+td_mod_api = { workspace = true }
+serde = { workspace = true, features = ["std"] }
+
+[dev-dependencies]
+toml = { workspace = true }

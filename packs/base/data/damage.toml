@@ -1,0 +1,6 @@
+# Damage multipliers: rows are damage types, columns armor types.
+[damage]
+normal = { light = 1.0, heavy = 1.0, fortified = 0.7 }
+pierce = { light = 1.5, heavy = 0.75, fortified = 0.35 }
+siege  = { light = 0.75, heavy = 1.0, fortified = 1.5 }
+magic  = { light = 1.25, heavy = 0.75, fortified = 0.5 }

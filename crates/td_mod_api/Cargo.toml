@@ -1,0 +1,15 @@
+[package]
+name = "td_mod_api"
+description = "Types shared by the open-td engine and wasm rule modules (ABI v1)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = ["codec"]
+# MessagePack encode/decode helpers. The types themselves are no_std + alloc.
+codec = ["dep:rmp-serde"]
+
+[dependencies]
+serde = { workspace = true }
+rmp-serde = { workspace = true, optional = true }

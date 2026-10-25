@@ -1,0 +1,68 @@
+# A short ground path over water and cliffs: flyers cut straight across
+# while walkers wind. Shows `air` vs `ground` flags and a custom legend.
+
+[map]
+name = "Skyway"
+
+[legend]
+"^" = "cliff"
+
+[[lane]]
+grid = """
+^^^^^^^^^^^^^^^^^^^^^^^
+^S......###########^^^^
+^######.###########^^^^
+^######.......#####~~~~
+^############.#####~~~~
+^##.........#.#####~~~~
+^##.#######...#####~~~~
+^##.###~~~~~~~~~~~~~~~~
+^##.###~~~~~~~~~~~~~~~~
+^##.....###############
+^#####.################
+^#####................E
+^^^^^^^^^^^^^^^^^^^^^^^
+"""
+
+[[wave]]
+unit = "grunt"
+count = 10
+interval = 0.8
+
+[[wave]]
+unit = "bat"
+count = 8
+interval = 1.0
+
+[[wave]]
+unit = "bat"
+count = 16
+interval = 0.5
+hp_percent = 150
+
+[[wave]]
+unit = "wolf"
+count = 14
+interval = 0.6
+
+[[wave]]
+unit = "wyvern"
+count = 6
+interval = 1.2
+
+[[wave]]
+unit = "knight"
+count = 10
+interval = 1.0
+
+[[wave]]
+unit = "wyvern"
+count = 10
+interval = 0.8
+hp_percent = 150
+
+[[wave]]
+unit = "dragon"
+count = 1
+interval = 1.0
+name = "Boss: Dragon"

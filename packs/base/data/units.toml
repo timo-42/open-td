@@ -1,0 +1,132 @@
+# Creeps, bosses and builders. Speed is in tiles per second.
+
+[[unit]]
+id = "grunt"
+name = "Grunt"
+hp = 60
+speed = 2.0
+armor_type = "light"
+size = "small"
+color = "#c94f3d"
+bounty = { gold = 2 }
+
+[[unit]]
+id = "runner"
+name = "Runner"
+hp = 40
+speed = 3.4
+armor_type = "light"
+size = "small"
+color = "#e0a030"
+bounty = { gold = 2 }
+
+[[unit]]
+id = "wolf"
+name = "Wolf"
+hp = 95
+speed = 2.6
+armor = 1
+armor_type = "light"
+color = "#8c8c8c"
+bounty = { gold = 3 }
+
+[[unit]]
+id = "knight"
+name = "Knight"
+hp = 190
+speed = 1.6
+armor = 3
+armor_type = "heavy"
+color = "#5070c0"
+bounty = { gold = 5 }
+
+[[unit]]
+id = "golem"
+name = "Stone golem"
+hp = 420
+speed = 1.2
+armor = 3
+armor_type = "fortified"
+size = "large"
+color = "#7d6e5a"
+immune_to = ["slow"]
+bounty = { gold = 8 }
+
+[[unit]]
+id = "sapper"
+name = "Sapper"
+hp = 160
+speed = 1.8
+armor = 2
+armor_type = "heavy"
+color = "#a05a2a"
+bounty = { gold = 5 }
+attack = { range = 0.9, damage = 25, cooldown = 1.0, damage_type = "siege" }
+
+[[unit]]
+id = "bat"
+name = "Bat"
+hp = 55
+speed = 2.8
+armor_type = "light"
+moves_on = ["air"]
+size = "small"
+color = "#6b3fa0"
+bounty = { gold = 3 }
+
+[[unit]]
+id = "wyvern"
+name = "Wyvern"
+hp = 300
+speed = 2.5
+armor = 2
+armor_type = "light"
+moves_on = ["air"]
+color = "#3fa08a"
+bounty = { gold = 12 }
+
+[[unit]]
+id = "ogre"
+name = "Ogre warlord"
+hp = 2600
+speed = 1.1
+armor = 5
+armor_type = "heavy"
+size = "large"
+color = "#4f8a2e"
+immune_to = ["stun"]
+bounty = { gold = 60 }
+attack = { range = 1.2, damage = 80, cooldown = 1.5, damage_type = "siege" }
+
+[[unit]]
+id = "dragon"
+name = "Dragon"
+hp = 3200
+speed = 1.5
+armor = 4
+armor_type = "heavy"
+moves_on = ["air"]
+size = "large"
+color = "#b02a2a"
+immune_to = ["slow", "stun"]
+bounty = { gold = 75 }
+
+# Builders walk on `unit` tiles and are never targeted by towers.
+
+[[unit]]
+id = "peasant"
+name = "Peasant"
+hp = 100
+speed = 3.0
+moves_on = ["unit"]
+size = "small"
+color = "#f0e0a0"
+
+[[unit]]
+id = "engineer"
+name = "Engineer"
+hp = 120
+speed = 4.0
+moves_on = ["unit"]
+size = "small"
+color = "#a0e0f0"
